@@ -1,0 +1,42 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: nfs-client-provisioner
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: nfs-client-provisioner
+    spec:
+      imagePullSecrets:
+        - name: registry-pull-secret
+      # 绑定角色定义的名称
+      serviceAccount: nfs-client-provisioner
+      containers:
+        # 镜像拉取
+        - name: nfs-client-provisioner
+          image: lizhenliang/nfs-client-provisioner:v2.0.0
+          # 自定义变量格式处理
+          volumeMounts:
+            - name: nfs-client-root
+              mountPath: /persistentvolumes
+          env:
+            - name: PROVISIONER_NAME
+              # 指定标识插件的值
+              value: fuseim.pri/ifs
+            - name: NFS_SERVER
+              # nfs地址
+              value: 10.1.100.51
+            - name: NFS_PATH
+              # 挂在路径
+              value: /data/nfs
+      volumes:
+        - name: nfs-client-root
+          nfs:
+            # nfs地址
+            server: 10.1.100.51
+            # 共享路径
+            path: /data/nfs

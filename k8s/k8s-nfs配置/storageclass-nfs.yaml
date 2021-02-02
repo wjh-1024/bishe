@@ -1,0 +1,7 @@
+apiVersion: storage.k8s.io/v1beta1
+kind: StorageClass
+metadata:
+  # StorageClass名称
+  name: managed-nfs-storage
+# 默认不支持nfs存储，添加支持web插件标识
+provisioner: fuseim.pri/ifs
